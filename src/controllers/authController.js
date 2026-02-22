@@ -2,17 +2,45 @@ const asyncHandler = require("express-async-handler");
 const User = require("../models/User");
 const generateToken = require("../utils/generateToken");
 
-const registerUser = asyncHandler(async (req, res, next) => {
+const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
 
-  // If you throw an error, asyncHandler automatically passes it to 'next'
+  // 1. Check if all fields are provided
   if (!name || !email || !password) {
     res.status(400);
-    throw new Error("Please fill all fields");
+    throw new Error("Please include all fields");
   }
 
-  // ... rest of your registration logic
+  // 2. Check if user already exists
+  const userExists = await User.findOne({ email });
+  if (userExists) {
+    res.status(400);
+    throw new Error("User already exists");
+  }
+
+  // 3. Create the user
+  // Note: Password hashing happens in your User model (pre-save hook)
+  const user = await User.create({
+    name,
+    email,
+    password,
+  });
+
+  if (user) {
+    // 4. Send success response with token
+    res.status(201).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      token: generateToken(user._id),
+    });
+  } else {
+    res.status(400);
+    throw new Error("Invalid user data");
+  }
 });
+
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
