@@ -5,23 +5,27 @@ const User = require("../models/User");
 const protect = asyncHandler(async (req, res, next) => {
   let token;
 
-  if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
     try {
       token = req.headers.authorization.split(" ")[1];
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
       req.user = await User.findById(decoded.id).select("-password");
 
-      // CRITICAL FIX: Use 'return' to stop execution after calling next()
-      return next(); 
+      if (!req.user) {
+        res.status(401);
+        throw new Error("User not found");
+      }
+
+      return next(); // ✅ Fix: Must return next() to stop execution
     } catch (error) {
-      console.error(error);
       res.status(401);
       throw new Error("Not authorized, token failed");
     }
   }
 
-  // CRITICAL FIX: Only run this if no token was found in the header
   if (!token) {
     res.status(401);
     throw new Error("Not authorized, no token");
@@ -30,7 +34,7 @@ const protect = asyncHandler(async (req, res, next) => {
 
 const admin = (req, res, next) => {
   if (req.user && req.user.role === "admin") {
-    next();
+    next(); // ✅ Fix: Plain next() here as it's not async
   } else {
     res.status(403);
     throw new Error("Not authorized as admin");

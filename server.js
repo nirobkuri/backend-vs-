@@ -19,6 +19,16 @@ app.use("/api/contact", require("./src/routes/contactRoutes"));
 
 app.get("/", (req, res) => {
   res.json({ message: "News Portal API is running..." });
+
+  // MUST BE AT THE VERY BOTTOM OF server.js
+  app.use((err, req, res, next) => {
+    // <--- Ensure 'next' is here even if unused
+    const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
+    res.status(statusCode).json({
+      message: err.message,
+      stack: process.env.NODE_ENV === "production" ? null : err.stack,
+    });
+  });
 });
 
 app.use((req, res) => {
