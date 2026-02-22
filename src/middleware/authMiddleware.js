@@ -3,23 +3,24 @@ const asyncHandler = require("express-async-handler");
 const User = require("../models/User");
 
 // Protect middleware
-const protect = asyncHandler(async (req, res, next) => {
+const protect = async (req, res) => {
   let token;
-
   if (req.headers.authorization?.startsWith("Bearer")) {
     token = req.headers.authorization.split(" ")[1];
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.user = await User.findById(decoded.id).select("-password");
-      return next(); // ✅ next() শুধু valid token হলে কল
+      const user = await User.findById(decoded.id).select("-password");
+      if (!user) return res.status(401).json({ message: "Not authorized" });
+
+      // এখানে আগের মতো next() নেই, তাই route কে কল করার জন্য আবার response handle করতে হবে
+      return res.json({ message: "User is authorized", user });
     } catch (error) {
-      return res.status(401).json({ message: "Not authorized, token failed" });
+      return res.status(401).json({ message: "Token failed" });
     }
   } else {
-    return res.status(401).json({ message: "Not authorized, no token" });
+    return res.status(401).json({ message: "No token provided" });
   }
-});
-
+};
 // Admin middleware
 const admin = (req, res, next) => {
   if (req.user && req.user.role === "admin") {
