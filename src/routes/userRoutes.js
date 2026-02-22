@@ -1,6 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const { getUserProfile, updateUserProfile, getPublicUserProfile } = require("../controllers/userController");
+const {
+  getUserProfile,
+  updateUserProfile,
+  getPublicUserProfile,
+} = require("../controllers/userController");
 const { protect } = require("../middleware/authMiddleware");
 const { upload } = require("../config/cloudinary");
 
