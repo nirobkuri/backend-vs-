@@ -1,33 +1,36 @@
+cat > src/middleware/authMiddleware.js << 'EOF'
 const jwt = require("jsonwebtoken");
 const asyncHandler = require("express-async-handler");
 const User = require("../models/User");
 
-// Protect middleware
-const protect = async (req, res) => {
+const protect = asyncHandler(async (req, res, next) => {
   let token;
   if (req.headers.authorization?.startsWith("Bearer")) {
-    token = req.headers.authorization.split(" ")[1];
     try {
+      token = req.headers.authorization.split(" ")[1];
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const user = await User.findById(decoded.id).select("-password");
-      if (!user) return res.status(401).json({ message: "Not authorized" });
-
-      // এখানে আগের মতো next() নেই, তাই route কে কল করার জন্য আবার response handle করতে হবে
-      return res.json({ message: "User is authorized", user });
+      req.user = await User.findById(decoded.id).select("-password");
+      next();
     } catch (error) {
-      return res.status(401).json({ message: "Token failed" });
+      res.status(401);
+      throw new Error("Not authorized, token failed");
     }
-  } else {
-    return res.status(401).json({ message: "No token provided" });
   }
-};
-// Admin middleware
+  if (!token) {
+    res.status(401);
+    throw new Error("Not authorized, no token");
+  }
+});
+
 const admin = (req, res, next) => {
   if (req.user && req.user.role === "admin") {
-    return next();
+    next();
   } else {
-    return res.status(403).json({ message: "Not authorized as admin" });
+    res.status(403);
+    throw new Error("Not authorized as admin");
   }
 };
 
 module.exports = { protect, admin };
+EOF
+echo "Fixed!"
