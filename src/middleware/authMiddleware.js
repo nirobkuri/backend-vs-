@@ -1,4 +1,3 @@
-cat > src/middleware/authMiddleware.js << 'EOF'
 const jwt = require("jsonwebtoken");
 const asyncHandler = require("express-async-handler");
 const User = require("../models/User");
@@ -32,5 +31,3 @@ const admin = (req, res, next) => {
 };
 
 module.exports = { protect, admin };
-EOF
-echo "Fixed!"
