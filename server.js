@@ -18,7 +18,7 @@ app.use("/api/users", require("./src/routes/userRoutes"));
 app.use("/api/contact", require("./src/routes/contactRoutes"));
 
 app.get("/", (req, res) => {
-  res.send("Backend API is running");
+  res.json({ message: "News Portal API is running..." });
 });
 
 app.use((req, res) => {
@@ -34,4 +34,6 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, "0.0.0.0", () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+module.exports = app;
