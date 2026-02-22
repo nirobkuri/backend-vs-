@@ -23,15 +23,15 @@ const userSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-// পাসওয়ার্ড সেভ করার আগে হ্যাশ করার জন্য
+// Password hashing before save
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
-  const salt = (await bcrypt.env.salt) || (await bcrypt.genSalt(10));
+  const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
   next();
 });
 
-// পাসওয়ার্ড ম্যাচ করার মেথড
+// Password match method
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
