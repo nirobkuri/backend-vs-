@@ -2,7 +2,7 @@ const asyncHandler = require("express-async-handler");
 const User = require("../models/User");
 const generateToken = require("../utils/generateToken");
 
-const registerUser = asyncHandler(async (req, res, next) => {
+const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
 
   // 1. Check if all fields are provided
@@ -19,7 +19,6 @@ const registerUser = asyncHandler(async (req, res, next) => {
   }
 
   // 3. Create the user
-  // Note: Password hashing happens in your User model (pre-save hook)
   const user = await User.create({
     name,
     email,

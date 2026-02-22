@@ -19,7 +19,7 @@ const protect = asyncHandler(async (req, res, next) => {
         throw new Error("User not found");
       }
 
-      return next(); // ✅ Fix: Must return next() to stop execution
+      next();
     } catch (error) {
       res.status(401);
       throw new Error("Not authorized, token failed");
