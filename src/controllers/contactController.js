@@ -17,3 +17,4 @@ const getContacts = asyncHandler(async (req, res) => {
 });
 
 module.exports = { submitContact, getContacts };
+

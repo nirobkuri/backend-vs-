@@ -65,3 +65,5 @@ const getMe = asyncHandler(async (req, res) => {
 });
 
 module.exports = { registerUser, loginUser, getMe };
+
+
