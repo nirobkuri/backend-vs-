@@ -1,8 +1,7 @@
 const jwt = require("jsonwebtoken");
-const asyncHandler = require("express-async-handler");
 const User = require("../models/User");
 
-const protect = asyncHandler(async (req, res, next) => {
+const protect = async (req, res, next) => {
   let token;
 
   if (
@@ -19,7 +18,7 @@ const protect = asyncHandler(async (req, res, next) => {
         throw new Error("User not found");
       }
 
-      next();
+      return next();
     } catch (error) {
       res.status(401);
       throw new Error("Not authorized, token failed");
@@ -30,11 +29,11 @@ const protect = asyncHandler(async (req, res, next) => {
     res.status(401);
     throw new Error("Not authorized, no token");
   }
-});
+};
 
 const admin = (req, res, next) => {
   if (req.user && req.user.role === "admin") {
-    next(); // ✅ Fix: Plain next() here as it's not async
+    next();
   } else {
     res.status(403);
     throw new Error("Not authorized as admin");
@@ -42,5 +41,3 @@ const admin = (req, res, next) => {
 };
 
 module.exports = { protect, admin };
-
-

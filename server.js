@@ -22,12 +22,12 @@ app.get("/", (req, res) => {
   res.json({ message: "News Portal API is running..." });
 });
 
-// ─── 404 Handler (must come before error handler) ─────────
+// ─── 404 Handler ──────────────────────────────────────────
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
 
-// ─── Global Error Handler (must be LAST, needs 4 params) ──
+// ─── Global Error Handler (must be LAST) ──────────────────
 app.use((err, req, res, next) => {
   const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
   res.status(statusCode).json({

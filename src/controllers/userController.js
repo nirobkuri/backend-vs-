@@ -1,17 +1,16 @@
-const asyncHandler = require("express-async-handler");
 const User = require("../models/User");
 const generateToken = require("../utils/generateToken");
 
-const getUserProfile = asyncHandler(async (req, res) => {
+const getUserProfile = async (req, res) => {
   const user = await User.findById(req.user._id).select("-password");
   if (!user) {
     res.status(404);
     throw new Error("User not found");
   }
   res.json(user);
-});
+};
 
-const updateUserProfile = asyncHandler(async (req, res) => {
+const updateUserProfile = async (req, res) => {
   const user = await User.findById(req.user._id);
   if (!user) {
     res.status(404);
@@ -38,17 +37,15 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     role: updated.role,
     token: generateToken(updated._id),
   });
-});
+};
 
-const getPublicUserProfile = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.params.id).select(
-    "-password -email -role",
-  );
+const getPublicUserProfile = async (req, res) => {
+  const user = await User.findById(req.params.id).select("-password -email -role");
   if (!user) {
     res.status(404);
     throw new Error("User not found");
   }
   res.json(user);
-});
+};
 
 module.exports = { getUserProfile, updateUserProfile, getPublicUserProfile };
