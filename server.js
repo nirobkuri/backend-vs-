@@ -12,6 +12,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// ─── Routes ───────────────────────────────────────────────
 app.use("/api/auth", require("./src/routes/authRoutes"));
 app.use("/api/news", require("./src/routes/newsRoutes"));
 app.use("/api/users", require("./src/routes/userRoutes"));
@@ -19,22 +20,14 @@ app.use("/api/contact", require("./src/routes/contactRoutes"));
 
 app.get("/", (req, res) => {
   res.json({ message: "News Portal API is running..." });
-
-  // MUST BE AT THE VERY BOTTOM OF server.js
-  app.use((err, req, res, next) => {
-    // <--- Ensure 'next' is here even if unused
-    const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
-    res.status(statusCode).json({
-      message: err.message,
-      stack: process.env.NODE_ENV === "production" ? null : err.stack,
-    });
-  });
 });
 
+// ─── 404 Handler (must come before error handler) ─────────
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
 
+// ─── Global Error Handler (must be LAST, needs 4 params) ──
 app.use((err, req, res, next) => {
   const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
   res.status(statusCode).json({
